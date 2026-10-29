@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Private browser-based screen recorder">
+  <title>Screenly — Screen Recorder</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Screenly home">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span>screenly</span>
+      </a>
+      <div class="topbar-actions">
+        <span id="supportStatus" class="support-status">Checking browser…</span>
+        <button id="settingsButton" class="icon-button" title="Settings" aria-label="Open settings">⚙</button>
+        <button id="libraryButton" class="library-button">Library <span id="libraryCount">0</span></button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow"><span class="live-dot"></span> PRIVATE BY DESIGN</p>
+          <h1>Capture your <span>best ideas.</span></h1>
+          <p class="hero-copy">Record your screen, camera, and voice directly in your browser. Nothing leaves your device.</p>
+        </div>
+        <div class="status-card">
+          <span id="statusIndicator" class="status-dot"></span>
+          <div><strong id="recordingStatus">Ready to record</strong><small id="statusDetail">Choose a source to get started</small></div>
+        </div>
+      </section>
+
+      <section class="workspace">
+        <div class="preview-card">
+          <div class="preview-header">
+            <div class="window-dots"><i></i><i></i><i></i></div>
+            <span id="previewLabel">Preview window</span>
+            <span id="previewResolution" class="resolution">No source</span>
+          </div>
+          <div class="preview-stage" id="previewStage">
+            <video id="screenPreview" autoplay muted playsinline></video>
+            <canvas id="studioCanvas" hidden></canvas>
+            <video id="webcamPreview" autoplay muted playsinline hidden></video>
+            <div id="previewEmpty" class="preview-empty">
+              <div class="empty-icon">⌁</div>
+              <strong>Your preview will appear here</strong>
+              <span>Select your screen or a window to begin</span>
+            </div>
+            <div id="timer" class="timer" hidden>00:00</div>
+            <span id="recordingBadge" class="recording-badge" hidden><span class="live-dot"></span> RECORDING</span>
+          </div>
+          <div class="preview-footer">
+            <span>Tip: Close sensitive tabs before sharing</span>
+            <button id="studioButton" class="text-button">✦ Studio mode <span class="pill">OFF</span></button>
+          </div>
+        </div>
+
+        <aside class="control-panel">
+          <div class="panel-heading"><span>Capture settings</span><button id="resetButton" class="text-button">Reset</button></div>
+          <button id="screenButton" class="source-button primary"><span class="control-icon">▣</span><span><strong>Share your screen</strong><small>Screen, window, or browser tab</small></span><b>→</b></button>
+          <div class="control-grid">
+            <button id="cameraButton" class="toggle-card"><span class="control-icon">◉</span><span><strong>Camera</strong><small id="cameraState">Off</small></span><i class="toggle"></i></button>
+            <button id="micButton" class="toggle-card"><span class="control-icon">♩</span><span><strong>Microphone</strong><small id="micState">Off</small></span><i class="toggle"></i></button>
+          </div>
+          <div id="audioMeterWrap" class="meter-wrap" hidden><span>Mic level</span><div class="meter"><i id="audioMeter"></i></div></div>
+          <label class="field-label" for="qualitySelect">Video quality</label>
+          <select id="qualitySelect" class="select-control"><option value="1080">1080p · High quality</option><option value="720">720p · Balanced</option><option value="480">480p · Small file</option></select>
+          <div class="control-grid compact">
+            <label class="field-label">Frame rate<select id="fpsSelect" class="select-control"><option value="30">30 FPS</option><option value="60">60 FPS</option></select></label>
+            <label class="field-label">Bitrate<select id="bitrateSelect" class="select-control"><option value="8000000">High</option><option value="5000000">Balanced</option><option value="2500000">Small</option></select></label>
+          </div>
+          <div class="record-controls">
+            <button id="startButton" class="record-button"><span></span> Start recording</button>
+            <button id="pauseButton" class="pause-button" disabled title="Pause recording">Ⅱ</button>
+          </div>
+          <p class="privacy-note">🔒 Recordings stay in this browser. We never upload your media.</p>
+        </aside>
+      </section>
+
+      <section class="feature-row">
+        <div><span class="feature-icon purple">◈</span><span><strong>Crystal clear</strong><small>Up to 1080p at 60 FPS</small></span></div>
+        <div><span class="feature-icon blue">◉</span><span><strong>Camera overlay</strong><small>Show your face with Studio mode</small></span></div>
+        <div><span class="feature-icon green">♧</span><span><strong>Local & private</strong><small>Your files never leave your device</small></span></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="settingsDialog" class="modal"><div class="modal-header"><h2>Settings</h2><button class="close-button" data-close="settingsDialog">×</button></div><div class="settings-content"><label class="field-label">Default filename<input id="filenameInput" class="text-control" value="screenly-recording"></label><label class="check-row"><input id="echoToggle" type="checkbox" checked> Echo cancellation</label><label class="check-row"><input id="noiseToggle" type="checkbox" checked> Noise suppression</label><p class="muted">Keyboard shortcuts: <kbd>Space</kbd> pause/resume while recording.</p></div></dialog>
+  <dialog id="libraryDialog" class="modal library-modal"><div class="modal-header"><div><h2>Recordings library</h2><p class="muted">Saved locally in this browser</p></div><button class="close-button" data-close="libraryDialog">×</button></div><div id="libraryList" class="library-list"></div></dialog>
+  <dialog id="resultDialog" class="modal result-modal"><div class="modal-header"><h2>Your recording is ready</h2><button class="close-button" data-close="resultDialog">×</button></div><video id="resultVideo" controls playsinline></video><div class="result-meta"><span id="resultDetails"></span><div><button id="snapshotButton" class="secondary-button">Take snapshot</button><button id="saveButton" class="primary-button">Save to library</button><button id="downloadButton" class="primary-button">Download</button></div></div></dialog>
+  <div id="toast" class="toast" role="status"></div>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
